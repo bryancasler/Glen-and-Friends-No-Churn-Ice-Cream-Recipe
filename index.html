@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>No-Churn Ice Cream — Based on Glen &amp; Friends Cooking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FBF8F4;--card:#fff;--ink:#2C2418;--ink-light:#7A6E5E;--ink-faint:#A89E8E;--accent:#B8632E;--rule:#E8E0D4}
+*{box-sizing:border-box;margin:0;padding:0}
+::selection{background:#B8632E33}
+body{background:var(--bg);color:var(--ink);font-family:'Source Serif 4',Georgia,serif;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:800px;margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:'Playfair Display',Georgia,serif}
+.mono{font-family:'DM Mono','Courier New',monospace}
+.label{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-light)}
+
+/* Hero */
+.hero{padding:80px 0 60px;text-align:center}
+.hero h1{font-size:clamp(40px,8vw,72px);font-weight:900;font-style:italic;line-height:1;margin-bottom:20px}
+.hero .sub{font-family:'Playfair Display',serif;font-size:clamp(18px,3vw,24px);color:var(--ink-light);font-style:italic}
+
+/* Divider */
+.divider{border-top:1px solid var(--rule);position:relative;height:20px;margin:0 auto;max-width:800px}
+.divider span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--bg);padding:0 16px;font-family:'Playfair Display',serif;font-size:18px;color:var(--ink-light)}
+
+/* Sections */
+section{padding:40px 0 60px}
+section h2{font-size:32px;text-align:center;margin-bottom:8px}
+
+/* Why grid */
+.why-item{display:grid;grid-template-columns:clamp(80px,15vw,120px) 1fr;gap:0 24px;margin-bottom:28px}
+.why-item .key{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;padding-top:2px;text-align:right}
+.why-item p{font-size:16px;line-height:1.7}
+
+/* Video */
+.video-wrap{margin:40px auto 0;max-width:640px;position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;border:1px solid var(--rule)}
+.video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+.video-link{display:block;margin:20px auto 0;text-align:center}
+.video-link a{font-family:'DM Mono',monospace;font-size:13px;color:var(--accent);text-decoration:underline}
+
+/* Card */
+.card{background:var(--card);border-radius:12px;padding:28px;border:1px solid var(--rule)}
+
+/* Serving control */
+.serving-ctrl{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:36px;flex-wrap:wrap}
+.serving-ctrl .stepper{display:flex;align-items:center;background:var(--card);border-radius:8px;overflow:hidden;border:1px solid var(--rule)}
+.serving-ctrl button{width:44px;height:44px;border:none;background:transparent;cursor:pointer;font-family:'DM Mono',monospace;font-size:20px;color:var(--ink)}
+.serving-ctrl button:hover{background:var(--rule)}
+.serving-ctrl .val{width:52px;text-align:center;font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--accent);line-height:44px}
+.reset-btn{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink-light);background:none;border:1px solid var(--rule);border-radius:4px;padding:4px 10px;cursor:pointer}
+
+/* Ingredient row */
+.ing-row{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--rule)}
+.ing-row:last-child{border-bottom:none}
+.ing-row .name{font-size:17px}
+.ing-row .amt{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--accent)}
+.ing-row .unit{font-family:'DM Mono',monospace;font-size:13px;color:var(--ink-light);margin-left:4px}
+.ing-row .us{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink-faint);margin-top:2px}
+
+/* Method */
+.step{display:grid;grid-template-columns:32px 1fr;gap:0 16px;margin-bottom:20px}
+.step .num{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--accent);line-height:1.3}
+.step strong{font-weight:600}
+.step p{font-size:15px;color:var(--ink-light);margin-top:4px}
+
+/* Flavor cards */
+.flavor-card{background:var(--card);border-radius:12px;border:1px solid var(--rule);padding:16px 20px;cursor:pointer;margin-bottom:10px;transition:all .2s ease}
+.flavor-card.open{padding:24px}
+.flavor-head{display:flex;align-items:center;justify-content:space-between}
+.flavor-head .left{display:flex;align-items:center;gap:12px}
+.flavor-head .left span:last-child{font-family:'Playfair Display',serif;font-size:18px;font-weight:700}
+.flavor-head .arrow{font-family:'DM Mono',monospace;font-size:12px;color:var(--ink-light);transition:transform .2s}
+.flavor-card.open .arrow{transform:rotate(90deg)}
+.flavor-body{margin-top:16px;display:none}
+.flavor-card.open .flavor-body{display:block}
+.flavor-body > p{font-size:15px;line-height:1.65;margin-bottom:16px}
+.addin-box{background:rgba(255,255,255,.6);border-radius:8px;padding:12px 16px;margin-bottom:12px}
+.addin-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0}
+.addin-row:not(:last-child){border-bottom:1px solid rgba(0,0,0,.06)}
+.flavor-tip{font-family:'DM Mono',monospace;font-size:12px;font-style:italic}
+
+/* Shopping */
+.pill-bar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:32px}
+.pill{font-family:'DM Mono',monospace;font-size:12px;padding:6px 14px;border-radius:20px;border:1px solid var(--rule);background:transparent;color:var(--ink-light);cursor:pointer;transition:all .15s}
+.pill.active{font-weight:700;border-width:2px}
+.aisle-head{padding:10px 24px;background:var(--rule);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-light)}
+.shop-item{display:flex;justify-content:space-between;align-items:center;padding:14px 24px;border-bottom:1px solid var(--rule);cursor:pointer;transition:opacity .15s}
+.shop-item.checked{opacity:.4}
+.shop-item .chk{width:20px;height:20px;border-radius:4px;border:2px solid var(--rule);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-right:12px}
+.shop-item.checked .chk{border-color:var(--accent);background:var(--accent)}
+.shop-item .item-name{font-size:15px}
+.shop-item.checked .item-name{text-decoration:line-through}
+
+/* Tips */
+.tip-line{font-size:15px;line-height:1.65;padding-left:16px;border-left:2px solid var(--accent);margin-bottom:10px}
+.tip-line:last-child{margin-bottom:0}
+
+/* Footer */
+footer{padding:30px 0;text-align:center;border-top:1px solid var(--rule)}
+footer p{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink-faint);line-height:1.8}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="wrap">
+<div class="hero">
+  <p class="label" style="margin-bottom:16px">Based on Glen &amp; Friends Cooking</p>
+  <h1>No-Churn Ice Cream</h1>
+  <p class="sub">The cream cheese base that changed everything</p>
+</div>
+</div>
+
+<div class="wrap"><div class="divider"><span>✦</span></div></div>
+
+<!-- WHY IT WORKS -->
+<div class="wrap">
+<section>
+  <h2>Why It Works</h2>
+  <p class="label" style="text-align:center;margin-bottom:40px">The science behind five ingredients</p>
+  <div class="why-item"><div class="key">Cream Cheese</div><p>This is Glen's key move. Most no-churn recipes are just condensed milk and whipped cream, which tastes one-note sweet. Cream cheese adds tang that balances the sugar, creates a richer mouthfeel, and acts as a stabilizer that keeps the texture smooth after days in the freezer. Think of it like adding sour cream to a cake batter. Same principle.</p></div>
+  <div class="why-item"><div class="key">Whipped Cream</div><p>An ice cream machine works by incorporating air while freezing. No-churn skips the machine by whipping air into the cream first, then folding everything together. The trapped air bubbles prevent ice crystals from forming and give you that light, scoopable texture. This is why gentle folding matters so much. Stir too hard and you deflate all the air you just whipped in.</p></div>
+  <div class="why-item"><div class="key">Condensed Milk</div><p>Traditional ice cream uses an egg custard base cooked on the stovetop. Condensed milk sidesteps all of that. It's already a concentrated emulsion of sugar, milk proteins, and fat. The high sugar content lowers the freezing point, which prevents the ice cream from freezing into a solid block and wards off freezer burn.</p></div>
+  <div class="why-item"><div class="key">Salt</div><p>Half a teaspoon seems small but it does real work. It suppresses the perception of sweetness (condensed milk is very sweet), brings out whatever flavor you're adding, and improves the overall mouthfeel. Skip it and the ice cream tastes flat.</p></div>
+</section>
+</div>
+
+<div class="wrap"><div class="divider"><span>✦</span></div></div>
+
+<!-- VIDEO -->
+<div class="wrap">
+<section>
+  <h2>Watch Glen Make It</h2>
+  <p class="label" style="text-align:center;margin-bottom:12px">From Glen &amp; Friends Cooking on YouTube</p>
+  <p style="text-align:center;font-size:15px;color:var(--ink-light);max-width:520px;margin:0 auto 24px;">Glen's cream cheese base shows up across his Toblerone, Rum &amp; Raisin, Cherry, Coffee Crisp, and Chocolate Chocolate Chip videos. Here's one of his cream cheese no-churn ice cream videos to get you started.</p>
+  <div class="video-wrap">
+    <iframe src="https://www.youtube.com/embed/videoseries?list=UUhBEbMKI1eCcejTtmI32UEw" title="Glen And Friends Cooking" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+  </div>
+  <p class="video-link"><a href="https://www.youtube.com/@GlenAndFriendsCooking" target="_blank" rel="noopener">Visit Glen &amp; Friends Cooking on YouTube →</a><br><span style="font-size:11px;color:var(--ink-faint)">Search his channel for "no churn cream cheese ice cream" to find specific flavors</span></p>
+</section>
+</div>
+
+<div class="wrap"><div class="divider"><span>✦</span></div></div>
+
+<!-- BASE RECIPE -->
+<div class="wrap">
+<section>
+  <h2>The Base</h2>
+  <p class="label" style="text-align:center;margin-bottom:40px">Cream cheese era, 2021+</p>
+
+  <div class="serving-ctrl">
+    <span style="font-size:16px">Servings</span>
+    <div class="stepper">
+      <button onclick="changeServings(-1)">−</button>
+      <span class="val" id="servingVal">6</span>
+      <button onclick="changeServings(1)">+</button>
+    </div>
+    <button class="reset-btn" id="resetBtn" onclick="resetServings()" style="display:none">Reset to 6</button>
+  </div>
+
+  <div class="card" id="baseIngredients"></div>
+
+  <div style="max-width:640px;margin:40px auto 0">
+    <h3 style="margin-bottom:24px">Method</h3>
+    <div class="step"><span class="num">1</span><div><strong>Beat the cream cheese</strong><p>Beat cream cheese in a large bowl until smooth and fluffy. You want it light and airy before adding anything else.</p></div></div>
+    <div class="step"><span class="num">2</span><div><strong>Build the base</strong><p>Add vanilla, salt, and condensed milk to the cream cheese. Beat until combined and smooth. Set this bowl aside.</p></div></div>
+    <div class="step"><span class="num">3</span><div><strong>Whip the cream</strong><p>In a separate chilled bowl, whip the heavy cream to stiff peaks. Stop the moment you get there. Over-whipping turns cream into butter.</p></div></div>
+    <div class="step"><span class="num">4</span><div><strong>Fold together</strong><p>Gently fold whipped cream into the cream cheese mixture in 2-3 additions. Fold, don't stir. You're preserving the air that will give this ice cream its texture.</p></div></div>
+    <div class="step"><span class="num">5</span><div><strong>Add your flavor</strong><p>If making a flavored version, fold in your add-ins now.</p></div></div>
+    <div class="step"><span class="num">6</span><div><strong>Freeze</strong><p>Pour into a freezer-safe container. Press plastic wrap directly onto the surface (this blocks ice crystals). Freeze at least 6 hours. Overnight is better.</p></div></div>
+  </div>
+</section>
+</div>
+
+<div class="wrap"><div class="divider"><span>✦</span></div></div>
+
+<!-- FLAVORS -->
+<div class="wrap">
+<section>
+  <h2>The Flavors</h2>
+  <p class="label" style="text-align:center;margin-bottom:12px">One base, seven directions</p>
+  <p style="text-align:center;font-size:15px;color:var(--ink-light);max-width:520px;margin:0 auto 36px;line-height:1.6">Each uses the full cream cheese base above. Make the base, then fold in the add-ins before freezing. Tap a flavor to see details and scaled quantities.</p>
+  <div id="flavorList"></div>
+</section>
+</div>
+
+<div class="wrap"><div class="divider"><span>✦</span></div></div>
+
+<!-- SHOPPING LIST -->
+<div class="wrap">
+<section>
+  <h2>Shopping List</h2>
+  <p class="label" style="text-align:center;margin-bottom:32px"><span id="shopServLabel">6</span> servings · tap items to check off</p>
+  <div class="pill-bar" id="pillBar"></div>
+  <div class="card" style="padding:0;overflow:hidden" id="shopList"></div>
+</section>
+</div>
+
+<div class="wrap"><div class="divider"><span>✦</span></div></div>
+
+<!-- TIPS -->
+<div class="wrap">
+<section style="padding-top:0">
+  <div class="card">
+    <h3 style="margin-bottom:16px">Glen's Tips (Across All Videos)</h3>
+    <p class="tip-line">Cold cream matters. Keep it in the fridge until the moment you whip it. A chilled metal bowl helps too.</p>
+    <p class="tip-line">Room temp cream cheese. If it's cold you'll get lumps. Let it sit out 30-45 minutes.</p>
+    <p class="tip-line">Plastic wrap on the surface. This is the single best thing you can do to prevent ice crystals.</p>
+    <p class="tip-line">If it's too hard to scoop, let it sit on the counter for 5-10 minutes. Don't microwave it.</p>
+    <p class="tip-line">Glen's "1 can" = 300 mL (Canadian). In the US that's a 14 oz can. Close enough.</p>
+  </div>
+</section>
+</div>
+
+<!-- FOOTER -->
+<div class="wrap">
+<footer>
+  <p>Recipes by <a href="https://www.youtube.com/@GlenAndFriendsCooking" target="_blank" rel="noopener" style="color:var(--accent)">Glen &amp; Friends Cooking</a> (YouTube).<br>
+  Cross-referenced from video descriptions, CookingBites forum, and recipe aggregators.<br>
+  Some add-in quantities for Toblerone, Coffee Crisp, and Chocolate Chocolate Chip are approximated from video context.<br>
+  Rum &amp; Raisin quantities confirmed from multiple text sources.</p>
+</footer>
+</div>
+
+<script>
+const BASE_SERVINGS = 6;
+let servings = 6;
+let selectedFlavor = 'vanilla_base';
+let checkedItems = {};
+let openFlavor = null;
+
+const BASE = [
+  {id:'cream_cheese',name:'Full fat cream cheese',amount:175,unit:'g',usNote:'6 oz block',aisle:'Dairy'},
+  {id:'vanilla',name:'Pure vanilla extract',amount:10,unit:'mL',usNote:'2 tsp',aisle:'Baking'},
+  {id:'salt',name:'Fine salt',amount:2,unit:'mL',usNote:'½ tsp',aisle:'Pantry'},
+  {id:'cream',name:'Heavy cream (35% fat)',amount:500,unit:'mL',usNote:'2 cups',aisle:'Dairy'},
+  {id:'condensed_milk',name:'Sweetened condensed milk',amount:300,unit:'mL',usNote:'1 can (14 oz)',aisle:'Baking'},
+];
+
+const FLAVORS = [
+  {id:'vanilla_base',name:'Pure Vanilla',emoji:'🍦',color:'#F5E6D0',accent:'#C4956A',desc:'The base itself, unadorned. Let the cream cheese and vanilla do the talking.',addIns:[],tip:'Use the best vanilla you can find. Vanilla bean paste instead of extract takes this up a level.'},
+  {id:'rum_raisin',name:'Rum & Raisin',emoji:'🍇',color:'#E8D5F0',accent:'#7B4F9E',desc:"Glen's most-requested cream cheese base flavor. The rum keeps it scoopable; the raisins get plump and boozy.",addIns:[{name:'Raisins',amount:375,unit:'mL',usNote:'1½ cups',aisle:'Baking'},{name:'Dark rum',amount:45,unit:'mL',usNote:'3 tbsp',aisle:'Spirits'}],tip:"Soak raisins in rum overnight for best results. Don't add more rum or it won't freeze."},
+  {id:'toblerone',name:'Toblerone',emoji:'🍫',color:'#FFF3DC',accent:'#8B6914',desc:'Chopped Toblerone folded through the cream cheese base. The nougat and almond bits create pockets of texture.',addIns:[{name:'Toblerone bars, chopped',amount:250,unit:'g',usNote:'~9 oz / 2-3 bars',aisle:'Candy'}],tip:'Chop into a mix of sizes. Small bits melt into the base, bigger chunks give you something to bite into.'},
+  {id:'coffee_crisp',name:'Coffee Crisp',emoji:'☕',color:'#F0E6D6',accent:'#6B4226',desc:'A very Canadian recipe. Coffee Crisp wafer bars chopped and folded through the base.',addIns:[{name:'Coffee Crisp bars, chopped',amount:200,unit:'g',usNote:'~7 oz / 3-4 bars',aisle:'Candy'}],tip:"If you can't find Coffee Crisp outside Canada, a coffee-flavored KitKat is the closest substitute."},
+  {id:'chocolate_chip',name:'Chocolate Chocolate Chip',emoji:'🍫',color:'#E8DCD0',accent:'#4A2C1A',desc:'Double chocolate: cocoa in the base, chips folded through. Rich without being heavy thanks to the cream cheese tang.',addIns:[{name:'Cocoa powder',amount:45,unit:'mL',usNote:'3 tbsp',aisle:'Baking'},{name:'Chocolate chips',amount:175,unit:'mL',usNote:'¾ cup',aisle:'Baking'}],tip:'Sift the cocoa into the cream cheese mixture to avoid lumps. Use good quality semi-sweet chips.'},
+  {id:'cherry',name:'Roasted Cherry',emoji:'🍒',color:'#F5DDE0',accent:'#A83248',desc:'The upgraded cherry. Luxardo or roasted cherries give deeper, more complex flavor than fresh or frozen.',addIns:[{name:'Luxardo cherries (with syrup)',amount:250,unit:'mL',usNote:'1 cup / ~1 jar',aisle:'Cocktail'}],tip:'Chop the cherries roughly. Include some of the syrup for color and flavor.'},
+  {id:'reeses',name:"Reese's Peanut Butter Cup",emoji:'🥜',color:'#F5E0C8',accent:'#D4760A',desc:"Chopped Reese's cups through the cream cheese base. Chocolate and peanut butter in every bite.",addIns:[{name:"Reese's PB Cups, chopped",amount:9,unit:'pcs',usNote:'regular size',aisle:'Candy'}],tip:"Freeze the Reese's cups first, then chop. They crumble more cleanly when cold."},
+];
+
+function scale(amount,s){const v=(amount/BASE_SERVINGS)*s;if(v>=100)return Math.round(v);if(v>=10)return Math.round(v*10)/10;return Math.round(v*100)/100;}
+
+function changeServings(d){servings=Math.max(1,Math.min(24,servings+d));render();}
+function resetServings(){servings=BASE_SERVINGS;render();}
+
+function renderBase(){
+  const el=document.getElementById('baseIngredients');
+  el.innerHTML=BASE.map((ing,i)=>{
+    const a=scale(ing.amount,servings);
+    let us=ing.usNote;
+    if(ing.id==='condensed_milk'){us=servings<=6?'1 can (14 oz)':servings<=12?'2 cans':Math.ceil(servings/6)+' cans';}
+    return `<div class="ing-row"><div class="name">${ing.name}</div><div style="text-align:right;flex-shrink:0;margin-left:16px"><span class="amt">${a}</span><span class="unit">${ing.unit}</span>${us?`<div class="us">${us}</div>`:''}</div></div>`;
+  }).join('');
+}
+
+function renderFlavors(){
+  const el=document.getElementById('flavorList');
+  el.innerHTML=FLAVORS.map(f=>{
+    const isOpen=openFlavor===f.id;
+    const bg=isOpen?f.color:'var(--card)';
+    const bdr=isOpen?f.accent+'44':'var(--rule)';
+    let body='';
+    if(isOpen){
+      let addInHtml='';
+      if(f.addIns.length){
+        addInHtml=`<div class="addin-box"><p class="label" style="margin-bottom:8px">Add-ins (scaled to ${servings} servings)</p>${f.addIns.map((a,i)=>{
+          const amt=a.unit==='pcs'?Math.ceil(scale(a.amount,servings)):scale(a.amount,servings);
+          return `<div class="addin-row"><span style="font-size:15px">${a.name}</span><span style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:${f.accent};margin-left:12px">${amt} ${a.unit}</span></div>`;
+        }).join('')}</div>`;
+      }
+      body=`<div class="flavor-body" style="display:block"><p>${f.desc}</p>${addInHtml}<p class="flavor-tip" style="color:${f.accent}">💡 ${f.tip}</p></div>`;
+    }
+    return `<div class="flavor-card${isOpen?' open':''}" style="background:${bg};border-color:${bdr}" onclick="toggleFlavor('${f.id}')"><div class="flavor-head"><div class="left"><span style="font-size:24px">${f.emoji}</span><span>${f.name}</span></div><span class="arrow">→</span></div>${body}</div>`;
+  }).join('');
+}
+
+function toggleFlavor(id){openFlavor=openFlavor===id?null:id;renderFlavors();}
+
+function renderPills(){
+  const el=document.getElementById('pillBar');
+  el.innerHTML=FLAVORS.map(f=>{
+    const active=selectedFlavor===f.id;
+    const s=active?`border:2px solid ${f.accent};background:${f.color};color:${f.accent};font-weight:700`:'';
+    return `<button class="pill${active?' active':''}" style="${s}" onclick="selectShopFlavor('${f.id}')">${f.emoji} ${f.name}</button>`;
+  }).join('');
+}
+
+function selectShopFlavor(id){selectedFlavor=id;checkedItems={};renderShop();renderPills();}
+
+function renderShop(){
+  const flavor=FLAVORS.find(f=>f.id===selectedFlavor);
+  const aisles={};
+  BASE.forEach(ing=>{
+    if(!aisles[ing.aisle])aisles[ing.aisle]=[];
+    const a=scale(ing.amount,servings);
+    let us=ing.usNote;
+    if(ing.id==='condensed_milk'){us=servings<=6?'1 can (14 oz)':servings<=12?'2 cans':Math.ceil(servings/6)+' cans';}
+    aisles[ing.aisle].push({name:ing.name,amount:`${a} ${ing.unit}`,usNote:us});
+  });
+  if(flavor&&flavor.addIns.length){
+    flavor.addIns.forEach(a=>{
+      if(!aisles[a.aisle])aisles[a.aisle]=[];
+      const amt=a.unit==='pcs'?Math.ceil(scale(a.amount,servings)):scale(a.amount,servings);
+      aisles[a.aisle].push({name:a.name,amount:`${amt} ${a.unit}`,usNote:a.usNote||''});
+    });
+  }
+  const el=document.getElementById('shopList');
+  el.innerHTML=Object.entries(aisles).map(([aisle,items])=>{
+    return `<div class="aisle-head">${aisle}</div>${items.map(item=>{
+      const ck=checkedItems[item.name]?'checked':'';
+      return `<div class="shop-item ${ck}" onclick="toggleCheck('${item.name.replace(/'/g,"\\'")}')"><div style="display:flex;align-items:center"><div class="chk">${checkedItems[item.name]?'<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}</div><span class="item-name">${item.name}</span></div><div style="text-align:right;flex-shrink:0;margin-left:12px"><span style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--accent)">${item.amount}</span>${item.usNote?`<div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--ink-faint)">${item.usNote}</div>`:''}</div></div>`;
+    }).join('')}`;
+  }).join('');
+  document.getElementById('shopServLabel').textContent=servings;
+}
+
+function toggleCheck(name){checkedItems[name]=!checkedItems[name];renderShop();}
+
+function render(){
+  document.getElementById('servingVal').textContent=servings;
+  document.getElementById('resetBtn').style.display=servings===BASE_SERVINGS?'none':'inline-block';
+  renderBase();
+  renderFlavors();
+  renderPills();
+  renderShop();
+}
+
+render();
+</script>
+</body>
+</html>
