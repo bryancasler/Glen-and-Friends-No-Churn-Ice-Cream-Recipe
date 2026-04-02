@@ -53,6 +53,17 @@ section h2{font-size:32px;text-align:center;margin-bottom:8px}
 
 /* Ingredient row */
 .ing-row{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--rule)}
+
+/* Vegan toggle */
+.vegan-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:24px}
+.vegan-row span{font-family:'DM Mono',monospace;font-size:12px;color:var(--ink-light)}
+.toggle{position:relative;width:44px;height:24px;background:var(--rule);border-radius:12px;cursor:pointer;border:none;padding:0;transition:background .2s}
+.toggle.on{background:#4a7c59}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.toggle.on::after{transform:translateX(20px)}
+.vegan-badge{display:inline-block;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;background:#4a7c59;color:#fff;padding:2px 8px;border-radius:4px;margin-left:6px;vertical-align:middle}
+.vegan-note{background:#f0f5f1;border:1px solid #c8d9cc;border-radius:10px;padding:20px 24px;margin-top:20px;font-size:14px;line-height:1.7;color:var(--ink)}
+.vegan-note strong{color:#4a7c59}
 .ing-row:last-child{border-bottom:none}
 .ing-row .name{font-size:17px}
 .ing-row .amt{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--accent)}
@@ -160,7 +171,14 @@ footer p{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink-faint);l
     </div>
   </div>
 
+  <div class="vegan-row">
+    <span>🌱 Vegan</span>
+    <button class="toggle" id="veganToggle1" onclick="toggleVegan()"></button>
+    <span style="font-size:11px;color:var(--ink-faint)" id="veganLabel1">Experimental</span>
+  </div>
+
   <div class="card" id="baseIngredients"></div>
+  <div id="veganNote1"></div>
 
   <div style="max-width:640px;margin:40px auto 0">
     <h3 style="margin-bottom:24px">Method</h3>
@@ -212,6 +230,12 @@ footer p{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink-faint);l
     </div>
   </div>
 
+  <div class="vegan-row">
+    <span>🌱 Vegan</span>
+    <button class="toggle" id="veganToggle2" onclick="toggleVegan()"></button>
+    <span style="font-size:11px;color:var(--ink-faint)" id="veganLabel2">Experimental</span>
+  </div>
+
   <div class="pill-bar" id="pillBar"></div>
   <div class="card" style="padding:0;overflow:hidden" id="shopList"></div>
 </section>
@@ -234,6 +258,7 @@ let servings = 6;
 let selectedFlavor = 'vanilla_base';
 let checkedItems = {};
 let openFlavor = null;
+let veganMode = false;
 
 const BASE = [
   {id:'cream_cheese',name:'Full fat cream cheese',amount:175,unit:'g',usNote:'6 oz block',aisle:'Dairy'},
@@ -241,6 +266,14 @@ const BASE = [
   {id:'salt',name:'Fine salt',amount:2,unit:'mL',usNote:'½ tsp',aisle:'Pantry'},
   {id:'cream',name:'Heavy cream (35% fat)',amount:500,unit:'mL',usNote:'2 cups',aisle:'Dairy'},
   {id:'condensed_milk',name:'Sweetened condensed milk',amount:300,unit:'mL',usNote:'1 can (14 oz)',aisle:'Baking'},
+];
+
+const VEGAN_BASE = [
+  {id:'cream_cheese',name:'Vegan cream cheese (Violife plain)',amount:175,unit:'g',usNote:'6 oz',aisle:'Dairy Alt'},
+  {id:'vanilla',name:'Pure vanilla extract',amount:10,unit:'mL',usNote:'2 tsp',aisle:'Baking'},
+  {id:'salt',name:'Fine salt',amount:2,unit:'mL',usNote:'½ tsp',aisle:'Pantry'},
+  {id:'cream',name:'Coconut cream (canned, chilled overnight)',amount:500,unit:'mL',usNote:'2 cups / ~2 cans',aisle:'Dairy Alt'},
+  {id:'condensed_milk',name:'Sweetened condensed coconut milk',amount:300,unit:'mL',usNote:'1 can (Nature\'s Charm)',aisle:'Dairy Alt'},
 ];
 
 const FLAVORS = [
@@ -252,19 +285,81 @@ const FLAVORS = [
   {id:'cherry',name:'Roasted Cherry',emoji:'🍒',color:'#F5DDE0',accent:'#A83248',desc:'The upgraded cherry. Luxardo or roasted cherries give deeper, more complex flavor than fresh or frozen.',addIns:[{name:'Luxardo cherries (with syrup)',amount:250,unit:'mL',usNote:'1 cup / ~1 jar',aisle:'Cocktail'}],tip:'Chop the cherries roughly. Include some of the syrup for color and flavor.'},
   {id:'reeses',name:"Reese's Peanut Butter Cup",emoji:'🥜',color:'#F5E0C8',accent:'#D4760A',desc:"Chopped Reese's cups through the cream cheese base. Chocolate and peanut butter in every bite.",addIns:[{name:"Reese's PB Cups, chopped",amount:9,unit:'pcs',usNote:'regular size',aisle:'Candy'}],tip:"Freeze the Reese's cups first, then chop. They crumble more cleanly when cold."},
   {id:'smokey_espresso_pb',name:'Smokey Espresso Peanut Butter',emoji:'🔥',color:'#EDE0D4',accent:'#5C3D2E',desc:"Not one of Glen's originals, but built on his base. Espresso and peanut butter are a natural pair. The smoked salt replaces the regular salt in the base and adds a low campfire warmth that ties the whole thing together without tasting like a barbecue.",addIns:[{name:'Creamy peanut butter',amount:190,unit:'mL',usNote:'¾ cup',aisle:'Pantry'},{name:'Instant espresso powder',amount:15,unit:'mL',usNote:'1 tbsp',aisle:'Baking'},{name:'Smoked sea salt (replaces base salt)',amount:2,unit:'mL',usNote:'½ tsp',aisle:'Spices'}],tip:"Dissolve the espresso powder into the condensed milk before adding it to the cream cheese. Swap the regular salt for the smoked salt, don't add both. A drizzle of honey on top before freezing is not required but not a bad idea either."},
+  {id:'mint_choc_chip',name:'Mint Chocolate Chip',emoji:'🌿',color:'#E0F0E8',accent:'#2D7A4F',desc:"A classic for a reason. Peppermint extract is strong, so a little goes a long way. The cream cheese base gives it more depth than the typical mint chip you get from a carton. Skip the food coloring if you want, the flavor doesn't care.",addIns:[{name:'Peppermint extract',amount:5,unit:'mL',usNote:'1 tsp',aisle:'Baking'},{name:'Dark or semi-sweet chocolate chips',amount:175,unit:'mL',usNote:'¾ cup',aisle:'Baking'},{name:'Green food coloring (optional)',amount:3,unit:'drops',usNote:'optional',aisle:'Baking'}],tip:"Add the peppermint extract to the cream cheese mixture, not the whipped cream. Taste it before folding. If you can't taste the mint clearly in the base, add another ¼ tsp. Use mini chips if you can find them, they distribute better."},
+  {id:'rosemary',name:'Rosemary Honey',emoji:'🐝',color:'#F0EDE4',accent:'#6B6245',desc:"A savory-leaning ice cream that works surprisingly well on the cream cheese base. The rosemary gets steeped into the cream first, then strained out, so you get the flavor without chewing on pine needles. Honey rounds it off. Serve this after a rich meal instead of a heavy dessert.",addIns:[{name:'Fresh rosemary sprigs (for steeping)',amount:4,unit:'pcs',usNote:'4 sprigs',aisle:'Produce'},{name:'Honey',amount:60,unit:'mL',usNote:'¼ cup',aisle:'Pantry'},{name:'Lemon zest',amount:5,unit:'mL',usNote:'1 tsp / ~1 lemon',aisle:'Produce'}],tip:"Warm the cream gently with the rosemary sprigs for 10 minutes, then strain and chill completely before whipping. Don't boil it. The honey goes into the cream cheese mixture along with the condensed milk. The lemon zest gets folded in at the end. A crack of black pepper on top when serving is optional but correct."},
 ];
 
 function scale(amount,s){const v=(amount/BASE_SERVINGS)*s;if(v>=100)return Math.round(v);if(v>=10)return Math.round(v*10)/10;return Math.round(v*100)/100;}
 
 function changeServings(d){servings=Math.max(1,Math.min(24,servings+d));render();}
 
+function toggleVegan(){veganMode=!veganMode;checkedItems={};render();}
+
+function getBase(){return veganMode?VEGAN_BASE:BASE;}
+
+function frac(n){
+  if(n===0)return '0';
+  var w=Math.floor(n);var rem=Math.round((n-w)*100)/100;var f='';
+  if(rem<0.08)f='';
+  else if(rem<0.2)f='⅛';
+  else if(rem<0.29)f='¼';
+  else if(rem<0.42)f='⅓';
+  else if(rem<0.58)f='½';
+  else if(rem<0.7)f='⅔';
+  else if(rem<0.8)f='¾';
+  else{w++;f='';}
+  if(w&&f)return w+' '+f;
+  if(w)return ''+w;
+  return f||'~'+(Math.round(n*10)/10);
+}
+
+function usNote(id,s){
+  var r=s/BASE_SERVINGS;
+  switch(id){
+    case 'cream_cheese':
+      var oz=6*r;return frac(oz)+' oz';
+    case 'vanilla':
+      var tsp=2*r;
+      if(tsp>=3){return frac(tsp/3)+' tbsp';}
+      return frac(tsp)+' tsp';
+    case 'salt':
+      var tsp=0.5*r;
+      if(tsp>=3){return frac(tsp/3)+' tbsp';}
+      return frac(tsp)+' tsp';
+    case 'cream':
+      var cups=2*r;
+      var note=frac(cups)+(cups===1?' cup':' cups');
+      if(veganMode){var cans=Math.ceil(cups/1.75);note+=' / ~'+cans+(cans===1?' can':' cans');}
+      return note;
+    case 'condensed_milk':
+      var cans=Math.ceil(s/6);
+      if(veganMode)return cans+(cans===1?" can (Nature's Charm)":" cans");
+      return cans===1?'1 can (14 oz)':cans+' cans';
+    default:return '';
+  }
+}
+
+function renderVeganToggles(){
+  ['veganToggle1','veganToggle2'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.className=veganMode?'toggle on':'toggle';}
+  });
+  ['veganLabel1','veganLabel2'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.textContent=veganMode?'On':'Experimental';}
+  });
+  const note=document.getElementById('veganNote1');
+  if(note){
+    note.innerHTML=veganMode?`<div class="vegan-note"><strong>🌱 Vegan substitutions</strong><br><br><strong>Cream cheese → Violife Just Like Cream Cheese (plain).</strong> Across multiple taste tests, Violife ranks highest for sweet applications. It's neutral, creamy, and holds up well. Kite Hill is a close second if you prefer an almond-based option.<br><br><strong>Heavy cream → Canned coconut cream, chilled overnight.</strong> Refrigerate the cans at least 12 hours. Scoop out only the solid fat that rises to the top; discard the liquid. Thai Kitchen and Nature's Charm are reliable brands. It won't whip as voluminous as dairy cream, so the result will be slightly denser.<br><br><strong>Condensed milk → Sweetened condensed coconut milk.</strong> Nature's Charm is the go-to brand. It's a direct 1:1 swap.<br><br><strong>What changes:</strong> Expect a subtle coconut undertone (more noticeable in vanilla, less so in chocolate or peanut butter flavors). The ice cream will freeze harder, so let it sit on the counter 10-15 minutes before scooping. The texture is denser and fudgier than the dairy version.<br><br><strong>Flavor note:</strong> Check that your add-ins are vegan too. Toblerone and Reese's are not. Vegan alternatives exist for both (Justin's dark chocolate PB cups, Vego bars, etc.).</div>`:'';}
+}
+
 function renderBase(){
+  var ingredients=getBase();
   const el=document.getElementById('baseIngredients');
-  el.innerHTML=BASE.map((ing,i)=>{
+  el.innerHTML=ingredients.map((ing,i)=>{
     const a=scale(ing.amount,servings);
-    let us=ing.usNote;
-    if(ing.id==='condensed_milk'){us=servings<=6?'1 can (14 oz)':servings<=12?'2 cans':Math.ceil(servings/6)+' cans';}
-    return `<div class="ing-row"><div class="name">${ing.name}</div><div style="text-align:right;flex-shrink:0;margin-left:16px"><span class="amt">${a}</span><span class="unit">${ing.unit}</span>${us?`<div class="us">${us}</div>`:''}</div></div>`;
+    let us=usNote(ing.id,servings);
+    return `<div class="ing-row"><div class="name">${ing.name}${veganMode&&(ing.id==='cream_cheese'||ing.id==='cream'||ing.id==='condensed_milk')?'<span class="vegan-badge">swap</span>':''}</div><div style="text-align:right;flex-shrink:0;margin-left:16px"><span class="amt">${a}</span><span class="unit">${ing.unit}</span>${us?`<div class="us">${us}</div>`:''}</div></div>`;
   }).join('');
 }
 
@@ -318,12 +413,12 @@ function selectShopFlavor(id){
 
 function renderShop(){
   const flavor=FLAVORS.find(f=>f.id===selectedFlavor);
+  const ingredients=getBase();
   const aisles={};
-  BASE.forEach(ing=>{
+  ingredients.forEach(ing=>{
     if(!aisles[ing.aisle])aisles[ing.aisle]=[];
     const a=scale(ing.amount,servings);
-    let us=ing.usNote;
-    if(ing.id==='condensed_milk'){us=servings<=6?'1 can (14 oz)':servings<=12?'2 cans':Math.ceil(servings/6)+' cans';}
+    let us=usNote(ing.id,servings);
     aisles[ing.aisle].push({name:ing.name,amount:`${a} ${ing.unit}`,usNote:us});
   });
   if(flavor&&flavor.addIns.length){
@@ -347,6 +442,7 @@ function toggleCheck(name){checkedItems[name]=!checkedItems[name];renderShop();}
 function render(){
   document.getElementById('servingVal').textContent=servings;
   document.getElementById('servingVal2').textContent=servings;
+  renderVeganToggles();
   renderBase();
   renderFlavors();
   renderPills();
